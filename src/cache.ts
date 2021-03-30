@@ -1,5 +1,6 @@
-import * as mongoose from 'mongoose'
 import * as debug from 'debug'
+import * as mongoose from 'mongoose'
+import { Singleflight } from '@zcong/singleflight'
 import { RedisCache } from '@zcong/node-redis-cache'
 import type { Document, Schema as SchemaType } from 'mongoose'
 
@@ -19,6 +20,8 @@ export function setupCache<
   D extends Document<any, {}> = Document<any, {}>,
   T extends SchemaType<D> = SchemaType<D>
 >(schema: T, cache: RedisCache, option: Option) {
+  const sf = new Singleflight()
+
   schema.statics.cacheFindById = async function (
     id: string | mongoose.ObjectId
   ) {
@@ -27,7 +30,7 @@ export function setupCache<
       key,
       async () => {
         d(`cacheFindById call db, _id: ${id}`)
-        return (await this.findById(id))?.toObject()
+        return (await this.findById(id))?.toObject() || null
       },
       option.expire
     )
@@ -42,46 +45,48 @@ export function setupCache<
     }
 
     const key = buildKeys(this.collection.collectionName, field, id)
-    const [val, isNotFoundPlaceHolder] = await cache.get(key, 'raw')
 
-    if (isNotFoundPlaceHolder) {
-      d(
-        `cacheFindByUniqueKey hit not found placeholder, field: ${field} id: ${id}`
-      )
-      return null
-    }
+    return sf.do(`${key}-outer`, async () => {
+      const [val, isNotFoundPlaceHolder] = await cache.get(key, 'raw')
 
-    if (val) {
-      d(
-        `cacheFindByUniqueKey found _id in cache, field: ${field} id: ${id}, _id: ${val}`
-      )
-      return (this as any).cacheFindById(val)
-    }
-
-    let doc: any = null
-
-    await cache.cacheFn(
-      key,
-      async () => {
-        d(`cacheFindByUniqueKey call db, field: ${field} id: ${id}`)
-        doc = (await this.findOne({ [field]: id }))?.toObject()
-        if (!doc) {
-          return null
-        }
-
-        await cache.set(
-          buildKeys(this.collection.collectionName, '_id', doc._id),
-          doc,
-          option.expire + cacheSafeGapBetweenIndexAndPrimary
+      if (isNotFoundPlaceHolder) {
+        d(
+          `cacheFindByUniqueKey hit not found placeholder, field: ${field} id: ${id}`
         )
+        return null
+      }
 
-        return doc._id.toString()
-      },
-      option.expire,
-      'raw'
-    )
+      if (val) {
+        d(
+          `cacheFindByUniqueKey found _id in cache, field: ${field} id: ${id}, _id: ${val}`
+        )
+        return (this as any).cacheFindById(val)
+      }
 
-    return doc
+      let doc: any = null
+      await cache.cacheFn(
+        key,
+        async () => {
+          d(`cacheFindByUniqueKey call db, field: ${field} id: ${id}`)
+          doc = (await this.findOne({ [field]: id }))?.toObject() || null
+          if (!doc) {
+            return null
+          }
+
+          await cache.set(
+            buildKeys(this.collection.collectionName, '_id', doc._id),
+            doc,
+            option.expire + cacheSafeGapBetweenIndexAndPrimary
+          )
+
+          return doc._id.toString()
+        },
+        option.expire,
+        'raw'
+      )
+
+      return doc
+    })
   }
 
   schema.statics.cacheUpdateOne = async function (doc: D) {
