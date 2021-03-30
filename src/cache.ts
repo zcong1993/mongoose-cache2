@@ -27,7 +27,7 @@ export function setupCache<
       key,
       async () => {
         d(`cacheFindById call db, _id: ${id}`)
-        return this.findById(id)
+        return (await this.findById(id))?.toObject()
       },
       option.expire
     )
@@ -64,7 +64,7 @@ export function setupCache<
       key,
       async () => {
         d(`cacheFindByUniqueKey call db, field: ${field} id: ${id}`)
-        doc = await this.findOne({ [field]: id })
+        doc = (await this.findOne({ [field]: id }))?.toObject()
         if (!doc) {
           return null
         }
