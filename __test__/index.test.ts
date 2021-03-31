@@ -52,27 +52,27 @@ const expectDocument = (expectedVal: any, actual: any) => {
   expect(JSON.stringify(actual)).toEqual(JSON.stringify(expectedVal))
 }
 
-it('cacheFindById should work well', async () => {
+it('mcFindById should work well', async () => {
   const [expectRes, clean] = await setupData()
 
   await repeatCall(10, async () => {
-    const resp = await Test.cacheFindById(expectRes._id)
+    const resp = await Test.mcFindById(expectRes._id)
     expectDocument(expectRes, resp)
   })
 
   await repeatCall(10, async () => {
-    const resp = await Test.cacheFindById(expectRes._id)
+    const resp = await Test.mcFindById(expectRes._id)
     expectDocument(expectRes, resp)
   })
 
   await clean()
 })
 
-it('cacheFindById should work well', async () => {
+it('mcFindById should work well', async () => {
   const [expectRes, clean] = await setupData()
 
   await repeatCall(10, async () => {
-    const resp = await Test.cacheFindByUniqueKey(
+    const resp = await Test.mcFindByUniqueKey(
       expectRes.studentCode,
       'studentCode'
     )
@@ -80,7 +80,7 @@ it('cacheFindById should work well', async () => {
   })
 
   await repeatCall(10, async () => {
-    const resp = await Test.cacheFindByUniqueKey(
+    const resp = await Test.mcFindByUniqueKey(
       expectRes.studentCode,
       'studentCode'
     )
@@ -90,89 +90,89 @@ it('cacheFindById should work well', async () => {
   await clean()
 })
 
-it('cacheUpdateOne should works well', async () => {
+it('mcUpdateOne should works well', async () => {
   const [expectRes, clean] = await setupData()
-  const resp = await Test.cacheFindByUniqueKey(
+  const resp = await Test.mcFindByUniqueKey(
     expectRes.studentCode,
     'studentCode'
   )
   expectDocument(expectRes, resp)
 
-  const resp2 = await Test.cacheFindByUniqueKey(
+  const resp2 = await Test.mcFindByUniqueKey(
     expectRes.studentCode,
     'studentCode'
   )
   expectDocument(expectRes, resp2)
 
-  const resp3 = await Test.cacheFindById(expectRes._id)
+  const resp3 = await Test.mcFindById(expectRes._id)
   expectDocument(expectRes, resp3)
 
-  const resp4 = await Test.cacheFindById(expectRes._id)
+  const resp4 = await Test.mcFindById(expectRes._id)
   expectDocument(expectRes, resp4)
 
   expectRes.desc = 'test222'
-  await Test.cacheUpdateOne(expectRes)
+  await Test.mcUpdateOne(expectRes)
 
-  const resp5 = await Test.cacheFindByUniqueKey(
+  const resp5 = await Test.mcFindByUniqueKey(
     expectRes.studentCode,
     'studentCode'
   )
   expectDocument(expectRes, resp5)
 
-  const resp6 = await Test.cacheFindByUniqueKey(
+  const resp6 = await Test.mcFindByUniqueKey(
     expectRes.studentCode,
     'studentCode'
   )
   expectDocument(expectRes, resp6)
 
-  const resp7 = await Test.cacheFindById(expectRes._id)
+  const resp7 = await Test.mcFindById(expectRes._id)
   expectDocument(expectRes, resp7)
 
-  const resp8 = await Test.cacheFindById(expectRes._id)
+  const resp8 = await Test.mcFindById(expectRes._id)
   expectDocument(expectRes, resp8)
 
   await clean()
 })
 
-it('cacheDeleteById should works well', async () => {
+it('mcDeleteById should works well', async () => {
   const [expectRes, clean] = await setupData()
-  const resp = await Test.cacheFindByUniqueKey(
+  const resp = await Test.mcFindByUniqueKey(
     expectRes.studentCode,
     'studentCode'
   )
   expectDocument(expectRes, resp)
 
-  const resp2 = await Test.cacheFindByUniqueKey(
+  const resp2 = await Test.mcFindByUniqueKey(
     expectRes.studentCode,
     'studentCode'
   )
   expectDocument(expectRes, resp2)
 
-  const resp3 = await Test.cacheFindById(expectRes._id)
+  const resp3 = await Test.mcFindById(expectRes._id)
   expectDocument(expectRes, resp3)
 
-  const resp4 = await Test.cacheFindById(expectRes._id)
+  const resp4 = await Test.mcFindById(expectRes._id)
   expectDocument(expectRes, resp4)
 
-  await Test.cacheDeleteById(expectRes._id)
+  await Test.mcDeleteById(expectRes._id)
 
-  const resp5 = await Test.cacheFindByUniqueKey(
+  const resp5 = await Test.mcFindByUniqueKey(
     expectRes.studentCode,
     'studentCode'
   )
 
   expectDocument(null, resp5)
 
-  const resp6 = await Test.cacheFindByUniqueKey(
+  const resp6 = await Test.mcFindByUniqueKey(
     expectRes.studentCode,
     'studentCode'
   )
   expectDocument(null, resp6)
 
-  const resp7 = await Test.cacheFindById(expectRes._id)
+  const resp7 = await Test.mcFindById(expectRes._id)
   expectDocument(null, resp7)
 
-  const resp8 = await Test.cacheFindById(expectRes._id)
+  const resp8 = await Test.mcFindById(expectRes._id)
   expectDocument(null, resp8)
 
   await clean()
