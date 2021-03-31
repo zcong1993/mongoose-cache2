@@ -30,7 +30,8 @@ export function setupCache<
         d(`mcFindById call db, _id: ${id}`)
         return (await this.findById(id))?.toObject() || null
       },
-      option.expire
+      option.expire,
+      'json'
     )
   }
 
