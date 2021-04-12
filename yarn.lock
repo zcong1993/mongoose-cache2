@@ -752,10 +752,10 @@
     "@typescript-eslint/types" "4.19.0"
     eslint-visitor-keys "^2.0.0"
 
-"@zcong/node-redis-cache@^0.3.1":
-  version "0.3.1"
-  resolved "https://registry.npmjs.org/@zcong/node-redis-cache/-/node-redis-cache-0.3.1.tgz#43e78232cdb1e5175262ba93e48cd07a47a64705"
-  integrity sha512-h+6aXWwdRDnEbwmDh9PmTmE8xOE7epjRC7I5raCN4EMinqwJVJgMs6/QfWbgweWS8DkTv1BxWKhMxBebkyvCOQ==
+"@zcong/node-redis-cache@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@zcong/node-redis-cache/-/node-redis-cache-0.4.0.tgz#c88c90b109eca352a8da8652eb56bf3ee0915693"
+  integrity sha512-5awC98j954DohiGP0nkFP1jKy1CVLWuuSTLfJar5LV7pyVJctT1AixBix7s29zrO6/brT5+R1+1Jy1WghxH2mQ==
   dependencies:
     "@zcong/singleflight" "^0.1.3"
 
