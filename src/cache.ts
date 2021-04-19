@@ -101,18 +101,9 @@ export function setupCache<
     if (option.disable) {
       return this.updateOne({ _id: doc._id }, doc)
     }
-
-    const delKeys: string[] = [
-      buildKeys(this.collection.collectionName, '_id', doc._id),
-    ]
-    option.uniqueFields.forEach((f) => {
-      delKeys.push(
-        buildKeys(this.collection.collectionName, f, (doc as any)[f])
-      )
-    })
     const resp = await this.updateOne({ _id: doc._id }, doc)
-    d(`mcUpdateOne update doc _id: ${doc._id}, delete cache`, delKeys)
-    cache.delete(...delKeys)
+    d(`mcUpdateOne update doc _id: ${doc._id}`)
+    ;(this as any).mcDeleteDocCache(doc)
     return resp
   }
 
@@ -128,16 +119,30 @@ export function setupCache<
       return
     }
     const resp = await this.deleteOne({ _id: id })
+    d(`mcDeleteById delete doc _id: ${doc._id}`)
+    ;(this as any).mcDeleteDocCache(doc)
+    return resp
+  }
+
+  schema.statics.mcDeleteDocCache = async function (doc: D) {
+    if (option.disable) {
+      return
+    }
+
     const delKeys: string[] = [
       buildKeys(this.collection.collectionName, '_id', doc._id),
     ]
+
     option.uniqueFields.forEach((f) => {
       delKeys.push(
         buildKeys(this.collection.collectionName, f, (doc as any)[f])
       )
     })
-    d(`mcDeleteById delete doc _id: ${doc._id}, delete cache`, delKeys)
-    cache.delete(...delKeys)
-    return resp
+
+    d(
+      `mcDeleteDocCache delete doc cache, _id: ${doc._id}, deleted cacheKeys`,
+      delKeys
+    )
+    await cache.delete(...delKeys)
   }
 }

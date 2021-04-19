@@ -178,6 +178,57 @@ it('mcDeleteById should works well', async () => {
   await clean()
 })
 
+it('mcDeleteDocCache should works well', async () => {
+  const Test2Schema = new Schema({
+    studentCode: {
+      type: String,
+      unique: true,
+    },
+    name: String,
+    age: Number,
+    desc: String,
+  })
+
+  const redis = new Redis('redis://localhost:6379/2')
+
+  setupCache(Test2Schema, new RedisCache({ redis, prefix: 'mongoose' }), {
+    expire: 5,
+    uniqueFields: ['studentCode'],
+  })
+
+  const Test2 = mongoose.model('Test2', Test2Schema)
+
+  const doc = await Test2.create({
+    studentCode: `a-${Date.now()}`,
+    name: 'test1',
+    age: 18,
+    desc: 'haha',
+  })
+
+  const expectRes: any = doc.toJSON()
+
+  let resp = await Test2.mcFindById(expectRes._id)
+  expectDocument(expectRes, resp)
+  resp = await Test2.mcFindById(expectRes._id)
+  expectDocument(expectRes, resp)
+
+  expect(await redis.dbsize()).toBe(1)
+
+  await Test2.mcDeleteDocCache(doc)
+  expect(await redis.dbsize()).toBe(0)
+
+  resp = await Test2.mcFindByUniqueKey(expectRes.studentCode, 'studentCode')
+  expectDocument(expectRes, resp)
+
+  resp = await Test2.mcFindByUniqueKey(expectRes.studentCode, 'studentCode')
+  expectDocument(expectRes, resp)
+
+  expect(await redis.dbsize()).toBe(2)
+
+  await Test2.mcDeleteDocCache(doc)
+  expect(await redis.dbsize()).toBe(0)
+})
+
 it('disable option should works well', async () => {
   const Test1Schema = new Schema({
     studentCode: {
@@ -231,6 +282,10 @@ it('disable option should works well', async () => {
 
   resp = await Test1.mcFindByUniqueKey(expectRes.studentCode, 'studentCode')
   expectDocument(expectRes, resp)
+
+  expect(await redis.dbsize()).toBe(0)
+
+  await Test1.mcDeleteDocCache(doc)
 
   expect(await redis.dbsize()).toBe(0)
 

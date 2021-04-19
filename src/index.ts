@@ -6,5 +6,6 @@ declare module 'mongoose' {
     mcFindByUniqueKey(id: string | ObjectId, field: string): Promise<T>
     mcUpdateOne(D: T): Promise<any>
     mcDeleteById(id: string | ObjectId): Promise<any>
+    mcDeleteDocCache(D: T): Promise<void>
   }
 }
