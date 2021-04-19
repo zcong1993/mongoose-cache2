@@ -1,3 +1,9 @@
+# [0.2.0](https://github.com/zcong1993/mongoose-cache2/compare/v0.1.3...v0.2.0) (2021-04-19)
+
+### Features
+
+- support disable option ([a4a8dff](https://github.com/zcong1993/mongoose-cache2/commit/a4a8dff32a2ec985331bb2ece6236ad39dfbe69e))
+
 ## [0.1.3](https://github.com/zcong1993/mongoose-cache2/compare/v0.1.2...v0.1.3) (2021-04-19)
 
 ### Bug Fixes
