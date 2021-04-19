@@ -10,6 +10,7 @@ const d = debug('mongoose-cache')
 export interface Option {
   expire: number
   uniqueFields: string[]
+  disable?: boolean
 }
 
 export function buildKeys(...keys: (string | mongoose.ObjectId)[]) {
@@ -23,6 +24,10 @@ export function setupCache<
   const sf = new Singleflight()
 
   schema.statics.mcFindById = async function (id: string | mongoose.ObjectId) {
+    if (option.disable) {
+      return (await this.findById(id))?.toObject() || null
+    }
+
     const key = buildKeys(this.collection.collectionName, '_id', id)
     return cache.cacheFn(
       key,
@@ -41,6 +46,10 @@ export function setupCache<
   ) {
     if (!option.uniqueFields.includes(field)) {
       throw new Error('invalid field')
+    }
+
+    if (option.disable) {
+      return (await this.findOne({ [field]: id }))?.toObject() || null
     }
 
     const key = buildKeys(this.collection.collectionName, field, id)
@@ -89,6 +98,10 @@ export function setupCache<
   }
 
   schema.statics.mcUpdateOne = async function (doc: D) {
+    if (option.disable) {
+      return this.updateOne({ _id: doc._id }, doc)
+    }
+
     const delKeys: string[] = [
       buildKeys(this.collection.collectionName, '_id', doc._id),
     ]
@@ -106,6 +119,10 @@ export function setupCache<
   schema.statics.mcDeleteById = async function (
     id: string | mongoose.ObjectId
   ) {
+    if (option.disable) {
+      return this.deleteOne({ _id: id })
+    }
+
     const doc = await (this as any).mcFindById(id)
     if (!doc) {
       return

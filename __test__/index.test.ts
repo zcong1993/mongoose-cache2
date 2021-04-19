@@ -68,7 +68,7 @@ it('mcFindById should work well', async () => {
   await clean()
 })
 
-it('mcFindById should work well', async () => {
+it('mcFindByUniqueKey should work well', async () => {
   const [expectRes, clean] = await setupData()
 
   await repeatCall(10, async () => {
@@ -176,4 +176,71 @@ it('mcDeleteById should works well', async () => {
   expectDocument(null, resp8)
 
   await clean()
+})
+
+it('disable option should works well', async () => {
+  const Test1Schema = new Schema({
+    studentCode: {
+      type: String,
+      unique: true,
+    },
+    name: String,
+    age: Number,
+    desc: String,
+  })
+
+  const redis = new Redis('redis://localhost:6379/1')
+
+  setupCache(Test1Schema, new RedisCache({ redis, prefix: 'mongoose' }), {
+    expire: 5,
+    uniqueFields: ['studentCode'],
+    disable: true,
+  })
+
+  const Test1 = mongoose.model('Test1', Test1Schema)
+
+  const doc = await Test1.create({
+    studentCode: `a-${Date.now()}`,
+    name: 'test1',
+    age: 18,
+    desc: 'haha',
+  })
+
+  const expectRes: any = doc.toJSON()
+
+  let resp = await Test1.mcFindById(expectRes._id)
+  expectDocument(expectRes, resp)
+  resp = await Test1.mcFindById(expectRes._id)
+  expectDocument(expectRes, resp)
+
+  expect(await redis.dbsize()).toBe(0)
+
+  resp = await Test1.mcFindByUniqueKey(expectRes.studentCode, 'studentCode')
+  expectDocument(expectRes, resp)
+
+  resp = await Test1.mcFindByUniqueKey(expectRes.studentCode, 'studentCode')
+  expectDocument(expectRes, resp)
+
+  expect(await redis.dbsize()).toBe(0)
+
+  expectRes.desc = 'test222'
+  await Test1.mcUpdateOne(expectRes)
+
+  resp = await Test1.mcFindById(expectRes._id)
+  expectDocument(expectRes, resp)
+
+  resp = await Test1.mcFindByUniqueKey(expectRes.studentCode, 'studentCode')
+  expectDocument(expectRes, resp)
+
+  expect(await redis.dbsize()).toBe(0)
+
+  await Test1.mcDeleteById(expectRes._id)
+
+  resp = await Test1.mcFindById(expectRes._id)
+  expectDocument(null, resp)
+
+  resp = await Test1.mcFindByUniqueKey(expectRes.studentCode, 'studentCode')
+  expectDocument(null, resp)
+
+  expect(await redis.dbsize()).toBe(0)
 })
