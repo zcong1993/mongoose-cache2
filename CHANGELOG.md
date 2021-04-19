@@ -1,3 +1,9 @@
+# [0.3.0](https://github.com/zcong1993/mongoose-cache2/compare/v0.2.0...v0.3.0) (2021-04-19)
+
+### Features
+
+- add mcDeleteDocCache method ([4c786b4](https://github.com/zcong1993/mongoose-cache2/commit/4c786b42ec03dfa91d362cf7915c1aa7fcd0b928))
+
 # [0.2.0](https://github.com/zcong1993/mongoose-cache2/compare/v0.1.3...v0.2.0) (2021-04-19)
 
 ### Features
