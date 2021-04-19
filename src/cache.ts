@@ -1,7 +1,7 @@
 import * as debug from 'debug'
 import * as mongoose from 'mongoose'
 import { Singleflight } from '@zcong/singleflight'
-import { RedisCache } from '@zcong/node-redis-cache'
+import { Cacher } from '@zcong/node-redis-cache'
 import type { Document, Schema as SchemaType } from 'mongoose'
 
 const cacheSafeGapBetweenIndexAndPrimary = 5
@@ -19,7 +19,7 @@ export function buildKeys(...keys: (string | mongoose.ObjectId)[]) {
 export function setupCache<
   D extends Document<any, {}> = Document<any, {}>,
   T extends SchemaType<D> = SchemaType<D>
->(schema: T, cache: RedisCache, option: Option) {
+>(schema: T, cache: Cacher, option: Option) {
   const sf = new Singleflight()
 
   schema.statics.mcFindById = async function (id: string | mongoose.ObjectId) {
