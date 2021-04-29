@@ -1,3 +1,9 @@
+# [0.4.0](https://github.com/zcong1993/mongoose-cache2/compare/v0.3.0...v0.4.0) (2021-04-29)
+
+### Features
+
+- add random expiryDeviation ([cbef0ef](https://github.com/zcong1993/mongoose-cache2/commit/cbef0ef1bad3c7f2d3520ceda7fa6434d71b86d4))
+
 # [0.3.0](https://github.com/zcong1993/mongoose-cache2/compare/v0.2.0...v0.3.0) (2021-04-19)
 
 ### Features
