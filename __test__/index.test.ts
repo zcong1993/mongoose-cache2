@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose'
 import * as Redis from 'ioredis'
 import { RedisCache } from '@zcong/node-redis-cache'
-import { setupCache } from '../src'
+import { setupCache, aroundExpire, Option, fixOption } from '../src'
 
 const { Schema } = mongoose
 
@@ -33,6 +33,7 @@ const redis = new Redis()
 setupCache(TestSchema, new RedisCache({ redis, prefix: 'mongoose' }), {
   expire: 5,
   uniqueFields: ['studentCode'],
+  expiryDeviation: 0.04,
 })
 
 const Test = mongoose.model('Test', TestSchema)
@@ -88,6 +89,10 @@ it('mcFindByUniqueKey should work well', async () => {
   })
 
   await clean()
+
+  await expect(
+    Test.mcFindByUniqueKey(expectRes.studentCode, 'aaa')
+  ).rejects.toThrow()
 })
 
 it('mcUpdateOne should works well', async () => {
@@ -176,6 +181,8 @@ it('mcDeleteById should works well', async () => {
   expectDocument(null, resp8)
 
   await clean()
+
+  await Test.mcDeleteById(expectRes._id)
 })
 
 it('mcDeleteDocCache should works well', async () => {
@@ -298,4 +305,31 @@ it('disable option should works well', async () => {
   expectDocument(null, resp)
 
   expect(await redis.dbsize()).toBe(0)
+})
+
+it('aroundExpire should works well', () => {
+  Array(10000)
+    .fill(null)
+    .forEach(() => {
+      const e = aroundExpire(100, 0.05)
+      expect(e >= 95 && e <= 105).toBeTruthy()
+    })
+})
+
+it('fixOption should works well', () => {
+  let o: Option = {
+    expire: 5,
+    uniqueFields: ['studentCode'],
+  }
+
+  fixOption(o)
+  expect(o.expiryDeviation).toBe(0.05)
+
+  o.expiryDeviation = -1
+  fixOption(o)
+  expect(o.expiryDeviation).toBe(0)
+
+  o.expiryDeviation = 2
+  fixOption(o)
+  expect(o.expiryDeviation).toBe(1)
 })

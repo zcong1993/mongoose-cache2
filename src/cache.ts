@@ -11,6 +11,34 @@ export interface Option {
   expire: number
   uniqueFields: string[]
   disable?: boolean
+  /**
+   * @default 0.05
+   * make the expiry unstable to avoid lots of cached items expire at the same time
+   * 0.05 means make the unstable expiry to be [0.95, 1.05] * seconds
+   * should in range [0, 1]
+   * default 0.05, set 0 to disable
+   */
+  expiryDeviation?: number
+}
+
+export function fixOption(option: Option) {
+  if (!option.expiryDeviation) {
+    option.expiryDeviation = 0.05
+  }
+
+  if (option.expiryDeviation < 0) {
+    option.expiryDeviation = 0
+  }
+
+  if (option.expiryDeviation > 1) {
+    option.expiryDeviation = 1
+  }
+}
+
+export function aroundExpire(expire: number, expiryDeviation: number) {
+  return Math.floor(
+    expire * (1 - expiryDeviation + 2 * expiryDeviation * Math.random())
+  )
 }
 
 export function buildKeys(...keys: (string | mongoose.ObjectId)[]) {
@@ -22,6 +50,11 @@ export function setupCache<
   T extends SchemaType<D> = SchemaType<D>
 >(schema: T, cache: Cacher, option: Option) {
   const sf = new Singleflight()
+
+  fixOption(option)
+
+  const aroundExpire2 = (expire: number) =>
+    aroundExpire(expire, option.expiryDeviation)
 
   schema.statics.mcFindById = async function (id: string | mongoose.ObjectId) {
     if (option.disable) {
@@ -35,7 +68,7 @@ export function setupCache<
         d(`mcFindById call db, _id: ${id}`)
         return (await this.findById(id))?.toObject() || null
       },
-      option.expire,
+      aroundExpire2(option.expire),
       'json'
     )
   }
@@ -84,12 +117,12 @@ export function setupCache<
           await cache.set(
             buildKeys(this.collection.collectionName, '_id', doc._id),
             doc,
-            option.expire + cacheSafeGapBetweenIndexAndPrimary
+            aroundExpire2(option.expire + cacheSafeGapBetweenIndexAndPrimary)
           )
 
           return doc._id.toString()
         },
-        option.expire,
+        aroundExpire2(option.expire),
         'raw'
       )
 
