@@ -766,6 +766,11 @@
   resolved "https://registry.npmjs.org/@zcong/singleflight/-/singleflight-0.1.3.tgz#02ec37594f0fc1d84b31add4c2bd8cf78aab1a1f"
   integrity sha512-voESTQy4H8Rs2UQaysXHnDAUkl2X7C5/GOQ536SSgkFJM7l6jfHHD1+ePJcf4wcc2nn2U2fXYhvxZtOyz42Sxw==
 
+"@zcong/singleflight@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@zcong/singleflight/-/singleflight-0.2.0.tgz#6a7627bb1ea12fafdba97d751c9e13a69dcd689b"
+  integrity sha512-Ta9IA4sM3iBUT0gDr9oxuAihporAX9fT9+3gBPA1SIdZQiN5j2sxcHNF2ofdZpaBHO8GZ5iZh34AJ+JEk5FxWw==
+
 abab@^2.0.3, abab@^2.0.5:
   version "2.0.5"
   resolved "https://registry.npmjs.org/abab/-/abab-2.0.5.tgz#c0b678fb32d60fc1219c784d6a826fe385aeb79a"
