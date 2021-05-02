@@ -13,16 +13,12 @@ jobs:
         with:
           fetch-depth: 0
           ref: master
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v1
         with:
           registry-url: "https://registry.npmjs.org"
-          node-version: 15
       - run: |
           if [ -f "yarn.lock" ]; then
             yarn install
-          elif [ -f "pnpm-lock.yaml" ]; then
-            npm i -g pnpm
-            pnpm i
           else
             npm install
           fi
