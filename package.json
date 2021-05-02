@@ -63,7 +63,7 @@
     ]
   },
   "dependencies": {
-    "@zcong/node-redis-cache": "^0.5.0",
+    "@zcong/node-redis-cache": "^0.6.0",
     "@zcong/singleflight": "^0.2.0",
     "debug": "^4.3.1"
   }
