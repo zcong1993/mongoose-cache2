@@ -30,6 +30,11 @@ const TestSchema = new Schema({
 
 const redis = new Redis()
 
+afterAll(async () => {
+  redis.disconnect()
+  await mongoose.connection.close()
+})
+
 setupCache(TestSchema, new RedisCache({ redis, prefix: 'mongoose' }), {
   expire: 5,
   uniqueFields: ['studentCode'],
