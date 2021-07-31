@@ -6,6 +6,11 @@ on:
 jobs:
   build:
     name: Release
+    timeout-minutes: 10
+    permissions:
+      packages: write
+      contents: write
+      issues: write
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'releases/v')
     steps:
@@ -16,7 +21,6 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
-          # registry-url: "https://registry.npmjs.org"
       - run: |
           if [ -f "yarn.lock" ]; then
             yarn install
