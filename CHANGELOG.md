@@ -1,3 +1,9 @@
+## [0.4.2](https://github.com/zcong1993/mongoose-cache2/compare/v0.4.1...v0.4.2) (2021-07-31)
+
+### Bug Fixes
+
+- **deps:** update dependency @zcong/singleflight to ^0.3.0 ([eeb1ecd](https://github.com/zcong1993/mongoose-cache2/commit/eeb1ecd80603b11b26aed660740b68fc32ec0903))
+
 ## [0.4.1](https://github.com/zcong1993/mongoose-cache2/compare/v0.4.0...v0.4.1) (2021-05-02)
 
 ### Bug Fixes
