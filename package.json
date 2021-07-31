@@ -13,8 +13,8 @@
     "test:cov": "npm run lint && npm run jest:cov",
     "lint": "eslint 'src/**/*.ts'",
     "format": "prettier --write '**/*.{ts,json,md}'",
-    "jest": "jest --forceExit",
-    "jest:cov": "jest --coverage --forceExit",
+    "jest": "jest --detectOpenHandles --forceExit",
+    "jest:cov": "jest --coverage --detectOpenHandles --forceExit",
     "prepublishOnly": "npm run build",
     "prepare": "husky install",
     "lint-staged": "lint-staged",
@@ -44,19 +44,7 @@
     "typescript": "^4.2.4"
   },
   "jest": {
-    "testEnvironment": "node",
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ]
+    "preset": "ts-jest"
   },
   "lint-staged": {
     "*.{js,json,ts}": [

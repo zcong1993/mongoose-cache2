@@ -33,7 +33,7 @@ const redis = new Redis()
 afterAll(async () => {
   redis.disconnect()
   await mongoose.connection.close()
-})
+}, 10000)
 
 setupCache(TestSchema, new RedisCache({ redis, prefix: 'mongoose' }), {
   expire: 5,
@@ -239,6 +239,8 @@ it('mcDeleteDocCache should works well', async () => {
 
   await Test2.mcDeleteDocCache(doc)
   expect(await redis.dbsize()).toBe(0)
+
+  redis.disconnect()
 })
 
 it('disable option should works well', async () => {
@@ -310,6 +312,8 @@ it('disable option should works well', async () => {
   expectDocument(null, resp)
 
   expect(await redis.dbsize()).toBe(0)
+
+  redis.disconnect()
 })
 
 it('aroundExpire should works well', () => {
