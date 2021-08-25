@@ -4,6 +4,10 @@
 
 > mongoose cache tool
 
+## Note
+
+The latest version is for `mongoose@6`, if you are using mongoose below version 6.0 please use version 0.4.2
+
 ## Install
 
 ```bash
