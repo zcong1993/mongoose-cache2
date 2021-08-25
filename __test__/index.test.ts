@@ -1,7 +1,7 @@
-import * as mongoose from 'mongoose'
-import * as Redis from 'ioredis'
 import { RedisCache } from '@zcong/node-redis-cache'
-import { setupCache, aroundExpire, Option, fixOption } from '../src'
+import * as Redis from 'ioredis'
+import * as mongoose from 'mongoose'
+import { aroundExpire, CacheModel, fixOption, Option, setupCache } from '../src'
 
 const { Schema } = mongoose
 
@@ -12,13 +12,16 @@ const repeatCall = (n: number, fn: Function) =>
       .map((_) => fn())
   )
 
-mongoose.connect('mongodb://localhost/test', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-})
+mongoose.connect('mongodb://localhost/test')
 
-const TestSchema = new Schema({
+interface ITest {
+  studentCode: string
+  name: string
+  age: number
+  desc: string
+}
+
+const TestSchema = new Schema<ITest>({
   studentCode: {
     type: String,
     unique: true,
@@ -41,7 +44,7 @@ setupCache(TestSchema, new RedisCache({ redis, prefix: 'mongoose' }), {
   expiryDeviation: 0.04,
 })
 
-const Test = mongoose.model('Test', TestSchema)
+const Test = mongoose.model<ITest, CacheModel<ITest>>('Test', TestSchema)
 
 const setupData = async (): Promise<[any, any]> => {
   const doc = await Test.create({
@@ -54,8 +57,23 @@ const setupData = async (): Promise<[any, any]> => {
   return [doc.toJSON(), () => Test.deleteOne({ _id: doc._id })]
 }
 
+const objSort = (obj: any) => {
+  if (!obj) {
+    return obj
+  }
+  const res: any = {}
+  Object.keys(obj)
+    .sort()
+    .forEach((k) => {
+      res[k] = obj[k]
+    })
+  return res
+}
+
 const expectDocument = (expectedVal: any, actual: any) => {
-  expect(JSON.stringify(actual)).toEqual(JSON.stringify(expectedVal))
+  expect(JSON.stringify(objSort(actual))).toEqual(
+    JSON.stringify(objSort(expectedVal))
+  )
 }
 
 it('mcFindById should work well', async () => {
@@ -78,17 +96,17 @@ it('mcFindByUniqueKey should work well', async () => {
   const [expectRes, clean] = await setupData()
 
   await repeatCall(10, async () => {
-    const resp = await Test.mcFindByUniqueKey(
-      expectRes.studentCode,
-      'studentCode'
+    const resp = await Test.mcFindByUniqueKey2(
+      'studentCode',
+      expectRes.studentCode
     )
     expectDocument(expectRes, resp)
   })
 
   await repeatCall(10, async () => {
-    const resp = await Test.mcFindByUniqueKey(
-      expectRes.studentCode,
-      'studentCode'
+    const resp = await Test.mcFindByUniqueKey2(
+      'studentCode',
+      expectRes.studentCode
     )
     expectDocument(expectRes, resp)
   })
@@ -96,21 +114,21 @@ it('mcFindByUniqueKey should work well', async () => {
   await clean()
 
   await expect(
-    Test.mcFindByUniqueKey(expectRes.studentCode, 'aaa')
+    Test.mcFindByUniqueKey2('aaa' as any, expectRes.studentCode)
   ).rejects.toThrow()
 })
 
 it('mcUpdateOne should works well', async () => {
   const [expectRes, clean] = await setupData()
-  const resp = await Test.mcFindByUniqueKey(
-    expectRes.studentCode,
-    'studentCode'
+  const resp = await Test.mcFindByUniqueKey2(
+    'studentCode',
+    expectRes.studentCode
   )
   expectDocument(expectRes, resp)
 
-  const resp2 = await Test.mcFindByUniqueKey(
-    expectRes.studentCode,
-    'studentCode'
+  const resp2 = await Test.mcFindByUniqueKey2(
+    'studentCode',
+    expectRes.studentCode
   )
   expectDocument(expectRes, resp2)
 
@@ -123,15 +141,15 @@ it('mcUpdateOne should works well', async () => {
   expectRes.desc = 'test222'
   await Test.mcUpdateOne(expectRes)
 
-  const resp5 = await Test.mcFindByUniqueKey(
-    expectRes.studentCode,
-    'studentCode'
+  const resp5 = await Test.mcFindByUniqueKey2(
+    'studentCode',
+    expectRes.studentCode
   )
   expectDocument(expectRes, resp5)
 
-  const resp6 = await Test.mcFindByUniqueKey(
-    expectRes.studentCode,
-    'studentCode'
+  const resp6 = await Test.mcFindByUniqueKey2(
+    'studentCode',
+    expectRes.studentCode
   )
   expectDocument(expectRes, resp6)
 
@@ -146,15 +164,15 @@ it('mcUpdateOne should works well', async () => {
 
 it('mcDeleteById should works well', async () => {
   const [expectRes, clean] = await setupData()
-  const resp = await Test.mcFindByUniqueKey(
-    expectRes.studentCode,
-    'studentCode'
+  const resp = await Test.mcFindByUniqueKey2(
+    'studentCode',
+    expectRes.studentCode
   )
   expectDocument(expectRes, resp)
 
-  const resp2 = await Test.mcFindByUniqueKey(
-    expectRes.studentCode,
-    'studentCode'
+  const resp2 = await Test.mcFindByUniqueKey2(
+    'studentCode',
+    expectRes.studentCode
   )
   expectDocument(expectRes, resp2)
 
@@ -166,16 +184,16 @@ it('mcDeleteById should works well', async () => {
 
   await Test.mcDeleteById(expectRes._id)
 
-  const resp5 = await Test.mcFindByUniqueKey(
-    expectRes.studentCode,
-    'studentCode'
+  const resp5 = await Test.mcFindByUniqueKey2(
+    'studentCode',
+    expectRes.studentCode
   )
 
   expectDocument(null, resp5)
 
-  const resp6 = await Test.mcFindByUniqueKey(
-    expectRes.studentCode,
-    'studentCode'
+  const resp6 = await Test.mcFindByUniqueKey2(
+    'studentCode',
+    expectRes.studentCode
   )
   expectDocument(null, resp6)
 
@@ -191,7 +209,7 @@ it('mcDeleteById should works well', async () => {
 })
 
 it('mcDeleteDocCache should works well', async () => {
-  const Test2Schema = new Schema({
+  const Test2Schema = new Schema<ITest>({
     studentCode: {
       type: String,
       unique: true,
@@ -208,7 +226,7 @@ it('mcDeleteDocCache should works well', async () => {
     uniqueFields: ['studentCode'],
   })
 
-  const Test2 = mongoose.model('Test2', Test2Schema)
+  const Test2 = mongoose.model<ITest, CacheModel<ITest>>('Test2', Test2Schema)
 
   const doc = await Test2.create({
     studentCode: `a-${Date.now()}`,
@@ -229,10 +247,10 @@ it('mcDeleteDocCache should works well', async () => {
   await Test2.mcDeleteDocCache(doc)
   expect(await redis.dbsize()).toBe(0)
 
-  resp = await Test2.mcFindByUniqueKey(expectRes.studentCode, 'studentCode')
+  resp = await Test2.mcFindByUniqueKey2('studentCode', expectRes.studentCode)
   expectDocument(expectRes, resp)
 
-  resp = await Test2.mcFindByUniqueKey(expectRes.studentCode, 'studentCode')
+  resp = await Test2.mcFindByUniqueKey2('studentCode', expectRes.studentCode)
   expectDocument(expectRes, resp)
 
   expect(await redis.dbsize()).toBe(2)
@@ -244,7 +262,7 @@ it('mcDeleteDocCache should works well', async () => {
 })
 
 it('disable option should works well', async () => {
-  const Test1Schema = new Schema({
+  const Test1Schema = new Schema<ITest>({
     studentCode: {
       type: String,
       unique: true,
@@ -262,7 +280,7 @@ it('disable option should works well', async () => {
     disable: true,
   })
 
-  const Test1 = mongoose.model('Test1', Test1Schema)
+  const Test1 = mongoose.model<ITest, CacheModel<ITest>>('Test1', Test1Schema)
 
   const doc = await Test1.create({
     studentCode: `a-${Date.now()}`,
@@ -280,10 +298,10 @@ it('disable option should works well', async () => {
 
   expect(await redis.dbsize()).toBe(0)
 
-  resp = await Test1.mcFindByUniqueKey(expectRes.studentCode, 'studentCode')
+  resp = await Test1.mcFindByUniqueKey2('studentCode', expectRes.studentCode)
   expectDocument(expectRes, resp)
 
-  resp = await Test1.mcFindByUniqueKey(expectRes.studentCode, 'studentCode')
+  resp = await Test1.mcFindByUniqueKey2('studentCode', expectRes.studentCode)
   expectDocument(expectRes, resp)
 
   expect(await redis.dbsize()).toBe(0)
@@ -294,7 +312,7 @@ it('disable option should works well', async () => {
   resp = await Test1.mcFindById(expectRes._id)
   expectDocument(expectRes, resp)
 
-  resp = await Test1.mcFindByUniqueKey(expectRes.studentCode, 'studentCode')
+  resp = await Test1.mcFindByUniqueKey2('studentCode', expectRes.studentCode)
   expectDocument(expectRes, resp)
 
   expect(await redis.dbsize()).toBe(0)
@@ -308,7 +326,7 @@ it('disable option should works well', async () => {
   resp = await Test1.mcFindById(expectRes._id)
   expectDocument(null, resp)
 
-  resp = await Test1.mcFindByUniqueKey(expectRes.studentCode, 'studentCode')
+  resp = await Test1.mcFindByUniqueKey2('studentCode', expectRes.studentCode)
   expectDocument(null, resp)
 
   expect(await redis.dbsize()).toBe(0)
@@ -326,7 +344,7 @@ it('aroundExpire should works well', () => {
 })
 
 it('fixOption should works well', () => {
-  let o: Option = {
+  let o: Option<ITest> = {
     expire: 5,
     uniqueFields: ['studentCode'],
   }

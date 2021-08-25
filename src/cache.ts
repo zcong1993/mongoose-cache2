@@ -1,15 +1,34 @@
-import * as debug from 'debug'
-import * as mongoose from 'mongoose'
-import { Singleflight } from '@zcong/singleflight'
 import { Cacher } from '@zcong/node-redis-cache'
-import type { Document, Schema as SchemaType } from 'mongoose'
+import { Singleflight } from '@zcong/singleflight'
+import * as debug from 'debug'
+import type { Document, Model, ObjectId, Schema as SchemaType } from 'mongoose'
+import * as mongoose from 'mongoose'
+
+export type DocType<T extends SchemaType> = T extends SchemaType<infer U>
+  ? U
+  : never
+
+export interface CacheModel<T> extends Model<T> {
+  mcFindById(id: string | ObjectId): Promise<T>
+  /**
+   * @deprecated use mcFindByUniqueKey2
+   */
+  mcFindByUniqueKey<K extends keyof T>(
+    id: string | ObjectId,
+    field: K
+  ): Promise<T>
+  mcFindByUniqueKey2<K extends keyof T>(field: K, id: T[K]): Promise<T>
+  mcUpdateOne(D: Document<any, any, T>): Promise<any>
+  mcDeleteById(id: string | ObjectId): Promise<any>
+  mcDeleteDocCache(D: Document<any, any, T>): Promise<void>
+}
 
 const cacheSafeGapBetweenIndexAndPrimary = 5
 const d = debug('mongoose-cache')
 
-export interface Option {
+export interface Option<T> {
   expire: number
-  uniqueFields: string[]
+  uniqueFields: (keyof T)[]
   disable?: boolean
   /**
    * @default 0.05
@@ -21,7 +40,7 @@ export interface Option {
   expiryDeviation?: number
 }
 
-export function fixOption(option: Option) {
+export function fixOption(option: Option<any>) {
   if (!option.expiryDeviation) {
     option.expiryDeviation = 0.05
   }
@@ -45,10 +64,11 @@ export function buildKeys(...keys: (string | mongoose.ObjectId)[]) {
   return keys.map((k) => (typeof k === 'object' ? k.toString() : k)).join(':')
 }
 
-export function setupCache<
-  D extends Document<any, {}> = Document<any, {}>,
-  T extends SchemaType<D> = SchemaType<D>
->(schema: T, cache: Cacher, option: Option) {
+export function setupCache<T extends SchemaType>(
+  schema: T,
+  cache: Cacher,
+  option: Option<DocType<T>>
+) {
   const sf = new Singleflight()
 
   fixOption(option)
@@ -73,19 +93,27 @@ export function setupCache<
     )
   }
 
-  schema.statics.mcFindByUniqueKey = async function (
-    id: string | mongoose.ObjectId,
-    field: string
-  ) {
+  schema.statics.mcFindByUniqueKey2 = async function <
+    K extends keyof DocType<T>
+  >(field: K, id: DocType<T>[K]) {
+    return (this as any).mcFindByUniqueKey(id, field)
+  }
+
+  /**
+   * @deprecated use mcFindByUniqueKey2
+   */
+  schema.statics.mcFindByUniqueKey = async function <
+    K extends keyof DocType<T>
+  >(id: string | mongoose.ObjectId, field: K) {
     if (!option.uniqueFields.includes(field)) {
       throw new Error('invalid field')
     }
 
     if (option.disable) {
-      return (await this.findOne({ [field]: id }))?.toObject() || null
+      return (await this.findOne({ [field]: id } as any))?.toObject() || null
     }
 
-    const key = buildKeys(this.collection.collectionName, field, id)
+    const key = buildKeys(this.collection.collectionName, field as string, id)
 
     return sf.do(`${key}-outer`, async () => {
       const [val, isNotFoundPlaceHolder] = await cache.get(key, 'raw')
@@ -109,7 +137,7 @@ export function setupCache<
         key,
         async () => {
           d(`mcFindByUniqueKey call db, field: ${field} id: ${id}`)
-          doc = (await this.findOne({ [field]: id }))?.toObject() || null
+          doc = (await this.findOne({ [field]: id } as any))?.toObject() || null
           if (!doc) {
             return null
           }
@@ -130,11 +158,13 @@ export function setupCache<
     })
   }
 
-  schema.statics.mcUpdateOne = async function (doc: D) {
+  schema.statics.mcUpdateOne = async function (
+    doc: Document<any, any, DocType<T>>
+  ) {
     if (option.disable) {
-      return this.updateOne({ _id: doc._id }, doc)
+      return this.updateOne({ _id: doc._id }, doc as any)
     }
-    const resp = await this.updateOne({ _id: doc._id }, doc)
+    const resp = await this.updateOne({ _id: doc._id }, doc as any)
     d(`mcUpdateOne update doc _id: ${doc._id}`)
     ;(this as any).mcDeleteDocCache(doc)
     return resp
@@ -144,20 +174,22 @@ export function setupCache<
     id: string | mongoose.ObjectId
   ) {
     if (option.disable) {
-      return this.deleteOne({ _id: id })
+      return this.deleteOne({ _id: id } as any)
     }
 
     const doc = await (this as any).mcFindById(id)
     if (!doc) {
       return
     }
-    const resp = await this.deleteOne({ _id: id })
+    const resp = await this.deleteOne({ _id: id } as any)
     d(`mcDeleteById delete doc _id: ${doc._id}`)
     ;(this as any).mcDeleteDocCache(doc)
     return resp
   }
 
-  schema.statics.mcDeleteDocCache = async function (doc: D) {
+  schema.statics.mcDeleteDocCache = async function (
+    doc: Document<any, any, DocType<T>>
+  ) {
     if (option.disable) {
       return
     }
@@ -168,7 +200,7 @@ export function setupCache<
 
     option.uniqueFields.forEach((f) => {
       delKeys.push(
-        buildKeys(this.collection.collectionName, f, (doc as any)[f])
+        buildKeys(this.collection.collectionName, f as string, (doc as any)[f])
       )
     })
 
