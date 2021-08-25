@@ -1,6 +1,6 @@
 {
   "name": "@zcong/mongoose-cache2",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "mongoose auto cache",
   "main": "./dist/index.js",
   "files": [

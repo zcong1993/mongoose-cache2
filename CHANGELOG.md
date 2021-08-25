@@ -1,3 +1,25 @@
+# [0.5.0](https://github.com/zcong1993/mongoose-cache2/compare/v0.4.2...v0.5.0) (2021-08-25)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @zcong/node-redis-cache to ^0.7.0 ([#24](https://github.com/zcong1993/mongoose-cache2/issues/24)) ([d023550](https://github.com/zcong1993/mongoose-cache2/commit/d0235505ad1cf8a391b457ebfd3af06b9a96feb4))
+
+
+### chore
+
+* **deps:** update dependency mongoose to v6 ([#26](https://github.com/zcong1993/mongoose-cache2/issues/26)) ([f664c3f](https://github.com/zcong1993/mongoose-cache2/commit/f664c3ff2557bbd29e230e65e16a67855ba7aad8))
+
+
+### BREAKING CHANGES
+
+* **deps:** rewrite types, please check document
+
+Co-authored-by: Renovate Bot <bot@renovateapp.com>
+Co-authored-by: zcong1993 <zhangcong1992@gmail.com>
+
+
+
 ## [0.4.2](https://github.com/zcong1993/mongoose-cache2/compare/v0.4.1...v0.4.2) (2021-07-31)
 
 ### Bug Fixes
