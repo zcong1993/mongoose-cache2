@@ -51,7 +51,7 @@
     "*.{js,json,ts}": "prettier --write"
   },
   "dependencies": {
-    "@zcong/node-redis-cache": "^0.7.2",
+    "@zcong/node-redis-cache": "^0.7.3",
     "@zcong/singleflight": "^0.3.0",
     "debug": "^4.3.2"
   },

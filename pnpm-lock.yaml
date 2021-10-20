@@ -8,7 +8,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': ^5.1.0
   '@typescript-eslint/parser': ^5.1.0
   '@zcong/js-release': ^0.2.5
-  '@zcong/node-redis-cache': ^0.7.2
+  '@zcong/node-redis-cache': ^0.7.3
   '@zcong/singleflight': ^0.3.0
   debug: ^4.3.2
   eslint: ^8.0.1
@@ -25,7 +25,7 @@ specifiers:
   typescript: ^4.4.4
 
 dependencies:
-  '@zcong/node-redis-cache': 0.7.2
+  '@zcong/node-redis-cache': 0.7.3
   '@zcong/singleflight': 0.3.0
   debug: 4.3.2
 
@@ -922,8 +922,8 @@ packages:
       tempfile: 3.0.0
     dev: true
 
-  /@zcong/node-redis-cache/0.7.2:
-    resolution: {integrity: sha512-z6HlVRcD9+p85MkqtMZwk36lintYJl7BjX8FY9tNRS6JUaJYwgQ9lf26yaMto4FDOZz2r71woMzpUIHrm9Q8Bg==}
+  /@zcong/node-redis-cache/0.7.3:
+    resolution: {integrity: sha512-/sD2PQ/jH1KBGIU3e07t+LFV3QpOYEldr4+7TTtMdTHAzABqICzgSap3QZTkoWRkbG/aG3KT5fonMipoJ0hobg==}
     dependencies:
       '@zcong/singleflight': 0.3.0
       debug: 4.3.2
