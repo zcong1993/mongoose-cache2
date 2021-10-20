@@ -344,7 +344,7 @@ it('aroundExpire should works well', () => {
 })
 
 it('fixOption should works well', () => {
-  let o: Option<ITest> = {
+  const o: Option<ITest> = {
     expire: 5,
     uniqueFields: ['studentCode'],
   }
