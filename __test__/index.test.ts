@@ -1,5 +1,5 @@
 import { RedisCache } from '@zcong/node-redis-cache'
-import * as Redis from 'ioredis'
+import Redis from 'ioredis'
 import * as mongoose from 'mongoose'
 import { aroundExpire, CacheModel, fixOption, Option, setupCache } from '../src'
 
