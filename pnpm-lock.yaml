@@ -8,7 +8,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': ^5.2.0
   '@typescript-eslint/parser': ^5.2.0
   '@zcong/js-release': ^0.2.5
-  '@zcong/node-redis-cache': ^0.7.3
+  '@zcong/node-redis-cache': ^0.9.0
   '@zcong/singleflight': ^0.3.0
   debug: ^4.3.2
   eslint: ^8.1.0
@@ -26,7 +26,7 @@ specifiers:
   typescript: ^4.4.4
 
 dependencies:
-  '@zcong/node-redis-cache': 0.7.3
+  '@zcong/node-redis-cache': 0.9.0_ioredis@4.28.0
   '@zcong/singleflight': 0.3.0
   debug: 4.3.2
 
@@ -80,7 +80,7 @@ packages:
       '@babel/traverse': 7.15.4
       '@babel/types': 7.15.6
       convert-source-map: 1.8.0
-      debug: 4.3.2
+      debug: 4.3.4
       gensync: 1.0.0-beta.2
       json5: 2.2.0
       semver: 6.3.0
@@ -377,7 +377,7 @@ packages:
       '@babel/helper-split-export-declaration': 7.15.4
       '@babel/parser': 7.15.8
       '@babel/types': 7.15.6
-      debug: 4.3.2
+      debug: 4.3.4
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -400,7 +400,7 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dependencies:
       ajv: 6.12.6
-      debug: 4.3.2
+      debug: 4.3.4
       espree: 9.0.0
       globals: 13.11.0
       ignore: 4.0.6
@@ -417,7 +417,7 @@ packages:
     engines: {node: '>=10.10.0'}
     dependencies:
       '@humanwhocodes/object-schema': 1.2.0
-      debug: 4.3.2
+      debug: 4.3.4
       minimatch: 3.0.4
     transitivePeerDependencies:
       - supports-color
@@ -905,7 +905,7 @@ packages:
     dependencies:
       '@typescript-eslint/types': 5.14.0
       '@typescript-eslint/visitor-keys': 5.14.0
-      debug: 4.3.2
+      debug: 4.3.4
       globby: 11.0.4
       is-glob: 4.0.3
       semver: 7.3.5
@@ -926,7 +926,7 @@ packages:
     dependencies:
       '@typescript-eslint/types': 5.2.0
       '@typescript-eslint/visitor-keys': 5.2.0
-      debug: 4.3.2
+      debug: 4.3.4
       globby: 11.0.4
       is-glob: 4.0.3
       semver: 7.3.5
@@ -984,12 +984,15 @@ packages:
       tempfile: 3.0.0
     dev: true
 
-  /@zcong/node-redis-cache/0.7.3:
-    resolution: {integrity: sha512-/sD2PQ/jH1KBGIU3e07t+LFV3QpOYEldr4+7TTtMdTHAzABqICzgSap3QZTkoWRkbG/aG3KT5fonMipoJ0hobg==}
+  /@zcong/node-redis-cache/0.9.0_ioredis@4.28.0:
+    resolution: {integrity: sha512-vW3gPXNuIwsW4wl9ijbSTFA5DQfhBO2DJ2bsVTi86SlWbcATv3Sn//9rEsNPdGZYJkhNVLfM8kTC66sBz2a6tw==}
+    peerDependencies:
+      ioredis: ^5.0.0
     dependencies:
       '@zcong/singleflight': 0.3.0
-      debug: 4.3.2
+      debug: 4.3.4
       hashring: 3.2.0
+      ioredis: 4.28.0
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -1050,7 +1053,7 @@ packages:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
     dependencies:
-      debug: 4.3.2
+      debug: 4.3.4
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -1737,6 +1740,17 @@ packages:
       ms: 2.1.2
       supports-color: 9.0.2
     dev: true
+
+  /debug/4.3.4:
+    resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
+    engines: {node: '>=6.0'}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+    dependencies:
+      ms: 2.1.2
 
   /decamelize-keys/1.1.0:
     resolution: {integrity: sha1-0XGoeTMlKAfrPLYdwcFEXQeN8tk=}
@@ -2492,7 +2506,7 @@ packages:
     dependencies:
       '@tootallnate/once': 1.1.2
       agent-base: 6.0.2
-      debug: 4.3.2
+      debug: 4.3.4
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -2502,7 +2516,7 @@ packages:
     engines: {node: '>= 6'}
     dependencies:
       agent-base: 6.0.2
-      debug: 4.3.2
+      debug: 4.3.4
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -2802,7 +2816,7 @@ packages:
     resolution: {integrity: sha512-n3s8EwkdFIJCG3BPKBYvskgXGoy88ARzvegkitk60NxRdwltLOTaH7CUiMRXvwYorl0Q712iEjcWB+fK/MrWVw==}
     engines: {node: '>=10'}
     dependencies:
-      debug: 4.3.2
+      debug: 4.3.4
       istanbul-lib-coverage: 3.2.0
       source-map: 0.6.1
     transitivePeerDependencies:
@@ -3697,7 +3711,7 @@ packages:
     resolution: {integrity: sha512-nGjm89lHja+T/b8cybAby6H0YgA4qYC/lx6UlwvHGqvTq8bDaNeCwl1sY8uRELrNbVWJzIihxVd+vphGGn1vBw==}
     engines: {node: '>=12.0.0'}
     dependencies:
-      debug: 4.3.2
+      debug: 4.3.4
       regexp-clone: 1.0.0
       sliced: 1.0.1
     transitivePeerDependencies:
