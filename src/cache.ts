@@ -113,21 +113,22 @@ export function setupCache<T extends SchemaType>(
       return (await this.findOne({ [field]: id } as any))?.toObject() || null
     }
 
-    const key = buildKeys(this.collection.collectionName, field as string, id)
+    const fieldStr = field.toString()
+    const key = buildKeys(this.collection.collectionName, fieldStr, id)
 
     return sf.do(`${key}-outer`, async () => {
       const [val, isNotFoundPlaceHolder] = await cache.get(key, 'raw')
 
       if (isNotFoundPlaceHolder) {
         d(
-          `mcFindByUniqueKey hit not found placeholder, field: ${field} id: ${id}`
+          `mcFindByUniqueKey hit not found placeholder, field: ${fieldStr} id: ${id}`
         )
         return null
       }
 
       if (val) {
         d(
-          `mcFindByUniqueKey found _id in cache, field: ${field} id: ${id}, _id: ${val}`
+          `mcFindByUniqueKey found _id in cache, field: ${fieldStr} id: ${id}, _id: ${val}`
         )
         return (this as any).mcFindById(val)
       }
@@ -136,7 +137,7 @@ export function setupCache<T extends SchemaType>(
       await cache.cacheFn(
         key,
         async () => {
-          d(`mcFindByUniqueKey call db, field: ${field} id: ${id}`)
+          d(`mcFindByUniqueKey call db, field: ${fieldStr} id: ${id}`)
           doc = (await this.findOne({ [field]: id } as any))?.toObject() || null
           if (!doc) {
             return null
