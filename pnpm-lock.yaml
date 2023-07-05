@@ -19,7 +19,7 @@ specifiers:
   jest: ^29.0.0
   lint-staged: ^13.0.0
   mongoose: ^7.0.0
-  prettier: ^2.6.1
+  prettier: ^3.0.0
   prettier-plugin-organize-imports: ^3.0.0
   ts-jest: ^29.0.0
   typescript: ^5.0.0
@@ -45,8 +45,8 @@ devDependencies:
   jest: 29.0.0_@types+node@18.11.5
   lint-staged: 13.0.0
   mongoose: 7.0.2
-  prettier: 2.6.1
-  prettier-plugin-organize-imports: 3.0.0_bdgeffvhti5jdrgvpjzmowrvsy
+  prettier: 3.0.0
+  prettier-plugin-organize-imports: 3.0.0_qefqtopqd5zoihp7sh4a5hg4ne
   ts-jest: 29.0.0_rvpjwltjr6hrbmpj74voxwvg6m
   typescript: 5.0.2
 
@@ -3720,19 +3720,19 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /prettier-plugin-organize-imports/3.0.0_bdgeffvhti5jdrgvpjzmowrvsy:
+  /prettier-plugin-organize-imports/3.0.0_qefqtopqd5zoihp7sh4a5hg4ne:
     resolution: {integrity: sha512-juSCJs5TMOqGGPaN/A/1xzWFzRPH2LG1LPLCr64dzKaVnPafJdtgDNmDVlU+8A4LbQzVJg0DTvgA8swBuIUhlg==}
     peerDependencies:
       prettier: '>=2.0'
       typescript: '>=2.9'
     dependencies:
-      prettier: 2.6.1
+      prettier: 3.0.0
       typescript: 5.0.2
     dev: true
 
-  /prettier/2.6.1:
-    resolution: {integrity: sha512-8UVbTBYGwN37Bs9LERmxCPjdvPxlEowx2urIL6urHzdb3SDq4B/Z6xLFCblrSnE4iKWcS6ziJ3aOYrc1kz/E2A==}
-    engines: {node: '>=10.13.0'}
+  /prettier/3.0.0:
+    resolution: {integrity: sha512-zBf5eHpwHOGPC47h0zrPyNn+eAEIdEzfywMoYn2XPi0P44Zp0tSq64rq0xAREh4auw2cJZHo9QUob+NqCQky4g==}
+    engines: {node: '>=14'}
     hasBin: true
     dev: true
 
