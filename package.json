@@ -31,7 +31,7 @@
     "@typescript-eslint/parser": "^5.16.0",
     "@zcong/js-release": "^0.2.5",
     "eslint": "^8.12.0",
-    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-jest": "^27.0.0",
     "husky": "^8.0.0",
